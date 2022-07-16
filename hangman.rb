@@ -1,8 +1,8 @@
 $file = File.open("words.txt","r").readlines
-require "json"
+require "yaml"
 
 class Game
-    def initialize(new,savegame=nil)
+    def initialize(new)
         @ended = false
         if new
             @guess = ""
@@ -24,10 +24,12 @@ class Game
 
             @guessed = Array.new(@solution.length, "_")
         elsif new == false
-            @alphabet = savegame[0]
-            @solution = savegame[1]
-            @guessed = savegame[2]
-            @wrong_guesses = savegame[3]
+            savegame = YAML.load(File.open("savegame.yaml","r"))
+
+            @alphabet = savegame[:alphabet]
+            @solution = savegame[:solution]
+            @guessed = savegame[:guessed]
+            @wrong_guesses = savegame[:wrong]
         end
     end
 
@@ -44,8 +46,8 @@ class Game
     end
 
     def save_game
-        savestate = JSON.dump([self.alphabet, self.solution, self.guessed, self.wrong_guesses])
-        File.open("savegame.json","w") {|file| file.write(savestate)}
+        savestate = {alphabet: self.alphabet, solution: self.solution, guessed: self.guessed, wrong: self.wrong_guesses}
+        File.open("savegame.yaml","w") {|file| file.write(YAML.dump(savestate))}
         @ended = true
     end
 
@@ -85,10 +87,6 @@ class Game
     end
 end
 
-def load_game
-    loaded = JSON.load(File.open("savegame.json","r"))
-
-end
 
 puts "Welcome to Hangman!"
 puts "You can start a new game by entering N or load the saved game with L"
@@ -100,8 +98,9 @@ end
 if new_game == "n"
     game = Game.new(true)
 elsif new_game == "l"
-    game = Game.new(false,JSON.load(File.open("savegame.json","r")))
+    game = Game.new(false)
 end
+
 while game.ended == false && game.wrong_guesses > 0
     puts ""
     game.display_guessed
