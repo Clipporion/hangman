@@ -1,27 +1,34 @@
 $file = File.open("words.txt","r").readlines
+require "json"
 
 class Game
-    def initialize
-
+    def initialize(new,savegame=nil)
         @ended = false
-        @guess = ""
-        puts "How many wrong guesses should be allowed from 1 to 15?"
+        if new
+            @guess = ""
+            puts "How many wrong guesses should be allowed from 1 to 15?"
 
-        @wrong_guesses = 0
-        while @wrong_guesses < 1 || @wrong_guesses > 15
-            @wrong_guesses = gets.chomp.to_i
+            @wrong_guesses = 0
+            while @wrong_guesses < 1 || @wrong_guesses > 15
+                @wrong_guesses = gets.chomp.to_i
+            end
+
+
+            @alphabet = []
+            ("a".."z").map {|char| @alphabet.push(char)}
+
+            @solution = []
+            while @solution.length < 5 || solution.length > 12
+                @solution = $file.sample.chomp.split("")
+            end
+
+            @guessed = Array.new(@solution.length, "_")
+        elsif new == false
+            @alphabet = savegame[0]
+            @solution = savegame[1]
+            @guessed = savegame[2]
+            @wrong_guesses = savegame[3]
         end
-
-
-        @alphabet = []
-        ("a".."z").map {|char| @alphabet.push(char)}
-
-        @solution = []
-        while @solution.length < 5 || solution.length > 12
-            @solution = $file.sample.chomp.split("")
-        end
-
-        @guessed = Array.new(@solution.length, "_")
     end
 
     attr_accessor :alphabet, :solution, :guessed, :wrong_guesses, :ended
@@ -36,11 +43,19 @@ class Game
         puts
     end
 
+    def save_game
+        savestate = JSON.dump([self.alphabet, self.solution, self.guessed, self.wrong_guesses])
+        File.open("savegame.json","w") {|file| file.write(savestate)}
+        @ended = true
+    end
+
     def make_guess
-        puts "Please choose a letter, still #{@wrong_guesses} wrong guesses left"
+        puts "Please choose a letter, still #{@wrong_guesses} wrong guesses left. Type save to save the game."
         guess = gets.chomp.downcase
 
-        if @alphabet.include?(guess)
+        if guess == "save"
+            save_game
+        elsif @alphabet.include?(guess)
             @guess = guess.downcase
         else 
             self.make_guess
@@ -70,8 +85,25 @@ class Game
     end
 end
 
-game = Game.new
+def load_game
+    loaded = JSON.load(File.open("savegame.json","r"))
+
+end
+
+puts "Welcome to Hangman!"
+puts "You can start a new game by entering N or load the saved game with L"
+new_game = ""
+while new_game != "n" && new_game != "l"
+    new_game = gets.chomp.downcase
+end
+
+if new_game == "n"
+    game = Game.new(true)
+elsif new_game == "l"
+    game = Game.new(false,JSON.load(File.open("savegame.json","r")))
+end
 while game.ended == false && game.wrong_guesses > 0
+    puts ""
     game.display_guessed
     game.make_guess
     game.compare_guess
