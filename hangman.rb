@@ -3,35 +3,27 @@ require "yaml"
 require "psych"
 
 class Game
-    def initialize(new)
+    def initialize
         @ended = false
-        if new
-            @guess = ""
-            puts "How many wrong guesses should be allowed from 1 to 15?"
 
-            @wrong_guesses = 0
-            while @wrong_guesses < 1 || @wrong_guesses > 15
-                @wrong_guesses = gets.chomp.to_i
-            end
+        @guess = ""
+        puts "How many wrong guesses should be allowed from 1 to 15?"
 
-
-            @alphabet = []
-            ("a".."z").map {|char| @alphabet.push(char)}
-
-            @solution = []
-            while @solution.length < 5 || solution.length > 12
-                @solution = $file.sample.chomp.split("")
-            end
-
-            @guessed = Array.new(@solution.length, "_")
-        elsif new == false
-            savegame = YAML.load(File.open("savegame.yaml","r"))
-
-            @alphabet = savegame[:alphabet]
-            @solution = savegame[:solution]
-            @guessed = savegame[:guessed]
-            @wrong_guesses = savegame[:wrong]
+        @wrong_guesses = 0
+        while @wrong_guesses < 1 || @wrong_guesses > 15
+            @wrong_guesses = gets.chomp.to_i
         end
+
+
+        @alphabet = []
+        ("a".."z").map {|char| @alphabet.push(char)}
+
+        @solution = []
+        while @solution.length < 5 || solution.length > 12
+            @solution = $file.sample.chomp.split("")
+        end
+
+        @guessed = Array.new(@solution.length, "_")
     end
 
     attr_accessor :alphabet, :solution, :guessed, :wrong_guesses, :ended
@@ -96,7 +88,7 @@ while new_game != "n" && new_game != "l"
 end
 
 if new_game == "n"
-    game = Game.new(true)
+    game = Game.new
 elsif new_game == "l"
     game = Psych.unsafe_load(File.open("savegame.yaml","r"))
 end
