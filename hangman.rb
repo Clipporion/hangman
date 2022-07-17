@@ -1,5 +1,6 @@
 $file = File.open("words.txt","r").readlines
 require "yaml"
+require "psych"
 
 class Game
     def initialize(new)
@@ -46,8 +47,7 @@ class Game
     end
 
     def save_game
-        savestate = {alphabet: self.alphabet, solution: self.solution, guessed: self.guessed, wrong: self.wrong_guesses}
-        File.open("savegame.yaml","w") {|file| file.write(YAML.dump(savestate))}
+        File.open("savegame.yaml","w") {|file| file.write(YAML.dump(self))}
         @ended = true
     end
 
@@ -98,7 +98,7 @@ end
 if new_game == "n"
     game = Game.new(true)
 elsif new_game == "l"
-    game = Game.new(false)
+    game = Psych.unsafe_load(File.open("savegame.yaml","r"))
 end
 
 while game.ended == false && game.wrong_guesses > 0

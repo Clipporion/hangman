@@ -1,5 +1,9 @@
----
-:alphabet:
+--- !ruby/object:Game
+ended: false
+guess: e
+wrong_guesses: 11
+alphabet:
+- a
 - b
 - c
 - d
@@ -8,6 +12,7 @@
 - h
 - i
 - j
+- k
 - l
 - m
 - "n"
@@ -15,6 +20,7 @@
 - p
 - q
 - r
+- s
 - t
 - u
 - v
@@ -22,18 +28,15 @@
 - x
 - "y"
 - z
-:solution:
-- g
+solution:
+- a
+- l
+- a
 - r
-- o
-- o
-- v
-- e
-:guessed:
+- m
+guessed:
 - _
 - _
 - _
 - _
 - _
-- e
-:wrong: 9
